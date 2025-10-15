@@ -1,0 +1,280 @@
+@page
+@model TestSonioxLocal.Pages.OBSStylerModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>OBS Styling Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .color-picker {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .color-picker.active {
+            border-color: #007bff;
+        }
+        .color-picker:hover {
+            border-color: #0056b3;
+        }
+        .slider-container {
+            margin: 15px 0;
+        }
+        .slider-container label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .slider-container input[type="range"] {
+            width: 100%;
+        }
+        .slider-container .value {
+            display: inline-block;
+            margin-left: 10px;
+            color: #666;
+        }
+        .css-output {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        .instructions {
+            background: #e7f3ff;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .instructions ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        .instructions li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 OBS Browser Source Styling Generator</h1>
+    
+    <div class="instructions">
+        <h3>📋 How to Use:</h3>
+        <ol>
+            <li>Adjust the settings below to style your captions</li>
+            <li>Copy the generated CSS from the output box</li>
+            <li>In OBS Studio: Right-click your Browser Source → Properties</li>
+            <li>Paste the CSS into the "Custom CSS" field</li>
+            <li>Click OK - your styles will be applied instantly!</li>
+        </ol>
+    </div>
+
+    <div class="container">
+        <h2>🎨 Text Color</h2>
+        <div id="colorSwatches">
+            <div class="color-picker active" data-color="#ffffff" style="background-color: #ffffff;" title="White"></div>
+            <div class="color-picker" data-color="#ffff00" style="background-color: #ffff00;" title="Yellow"></div>
+            <div class="color-picker" data-color="#00ff00" style="background-color: #00ff00;" title="Green"></div>
+            <div class="color-picker" data-color="#00ffff" style="background-color: #00ffff;" title="Cyan"></div>
+            <div class="color-picker" data-color="#ff00ff" style="background-color: #ff00ff;" title="Magenta"></div>
+            <div class="color-picker" data-color="#ff0000" style="background-color: #ff0000;" title="Red"></div>
+            <div class="color-picker" data-color="#ff8000" style="background-color: #ff8000;" title="Orange"></div>
+            <div class="color-picker" data-color="#0000ff" style="background-color: #0000ff;" title="Blue"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📏 Text Size</h2>
+        <div class="slider-container">
+            <label for="textSize">Font Size: <span id="textSizeValue">24px</span></label>
+            <input type="range" id="textSize" min="12" max="48" value="24">
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📐 Line Spacing</h2>
+        <div class="slider-container">
+            <label for="lineSpacing">Line Height: <span id="lineSpacingValue">1.5</span></label>
+            <input type="range" id="lineSpacing" min="1.0" max="3.0" step="0.1" value="1.5">
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🎭 Container Background</h2>
+        <div class="slider-container">
+            <label for="containerOpacity">Background Opacity: <span id="containerOpacityValue">70%</span></label>
+            <input type="range" id="containerOpacity" min="0" max="100" value="70">
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>👁️ Visibility</h2>
+        <div class="slider-container">
+            <label>
+                <input type="checkbox" id="showTranscriptions" checked> Show Transcriptions
+            </label>
+            <label>
+                <input type="checkbox" id="showTranslations" checked> Show Translations
+            </label>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📋 Generated CSS</h2>
+        <p>Copy this CSS and paste it into OBS Browser Source "Custom CSS" field:</p>
+        <div id="cssOutput" class="css-output"></div>
+        <button id="copyBtn" class="copy-btn">📋 Copy CSS</button>
+    </div>
+
+    <script>
+        let currentTextColor = '#ffffff';
+        let currentTextSize = 24;
+        let currentLineSpacing = 1.5;
+        let currentContainerOpacity = 70;
+        let showTranscriptions = true;
+        let showTranslations = true;
+
+        // Color picker
+        document.querySelectorAll('.color-picker').forEach(picker => {
+            picker.addEventListener('click', function() {
+                document.querySelectorAll('.color-picker').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                currentTextColor = this.getAttribute('data-color');
+                generateCSS();
+            });
+        });
+
+        // Text size slider
+        document.getElementById('textSize').addEventListener('input', function() {
+            currentTextSize = this.value;
+            document.getElementById('textSizeValue').textContent = this.value + 'px';
+            generateCSS();
+        });
+
+        // Line spacing slider
+        document.getElementById('lineSpacing').addEventListener('input', function() {
+            currentLineSpacing = this.value;
+            document.getElementById('lineSpacingValue').textContent = this.value;
+            generateCSS();
+        });
+
+        // Container opacity slider
+        document.getElementById('containerOpacity').addEventListener('input', function() {
+            currentContainerOpacity = this.value;
+            document.getElementById('containerOpacityValue').textContent = this.value + '%';
+            generateCSS();
+        });
+
+        // Visibility checkboxes
+        document.getElementById('showTranscriptions').addEventListener('change', function() {
+            showTranscriptions = this.checked;
+            generateCSS();
+        });
+
+        document.getElementById('showTranslations').addEventListener('change', function() {
+            showTranslations = this.checked;
+            generateCSS();
+        });
+
+        // Copy button
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            const cssOutput = document.getElementById('cssOutput');
+            cssOutput.select();
+            document.execCommand('copy');
+            
+            // Visual feedback
+            const originalText = this.textContent;
+            this.textContent = '✅ Copied!';
+            this.style.background = '#28a745';
+            setTimeout(() => {
+                this.textContent = originalText;
+                this.style.background = '#007bff';
+            }, 2000);
+        });
+
+        function generateCSS() {
+            const opacity = currentContainerOpacity / 100;
+            const containerColor = `rgba(0, 0, 0, ${opacity})`;
+            
+            let css = `/* OBS Browser Source Custom CSS */
+/* Generated by OBS Styling Generator */
+
+/* Text styling */
+#transcriptionContainer,
+#captionContainer {
+    color: ${currentTextColor} !important;
+    font-size: ${currentTextSize}px !important;
+    line-height: ${currentLineSpacing} !important;
+    background-color: ${containerColor} !important;
+}
+
+/* Hide scrollbars */
+#transcriptionContainer::-webkit-scrollbar,
+#captionContainer::-webkit-scrollbar {
+    display: none !important;
+}
+
+/* Container visibility */
+${!showTranscriptions ? `#transcriptionContainer,
+#transcriptionLabel {
+    display: none !important;
+}` : ''}
+
+${!showTranslations ? `#captionContainer,
+#translationLabel {
+    display: none !important;
+}` : ''}
+
+/* Force override any conflicting styles */
+body {
+    overflow: hidden !important;
+}`;
+
+            document.getElementById('cssOutput').textContent = css;
+        }
+
+        // Initialize
+        generateCSS();
+    </script>
+</body>
+</html>

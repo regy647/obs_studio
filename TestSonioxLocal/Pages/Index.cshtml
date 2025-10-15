@@ -1,0 +1,1196 @@
+﻿@page
+@model TestSonioxLocal.Pages.IndexModel
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Captions Test</title>
+    <style>
+        :root {
+            --text-color: #ffffff;
+            --text-size-transcription: 24px;
+            --text-size-translation: 28px;
+            --line-spacing: 1.5;
+            --container-color: rgba(0, 0, 0, 0.7);
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* prevent page scrolling */
+            font-family: Arial, sans-serif;
+        }
+
+        /* NEW: Top container for TRANSCRIPTIONS (original speech) */
+        #transcriptionContainer {
+            position: absolute;
+            top: 30px;
+            left: 20px;
+            right: 280px; /* Less space to use more of the screen */
+            height: 40%; /* Takes top 40% of available space */
+            width: 85%;
+            padding: 10px;
+            border: 2px solid #fffff;
+            background-color: var(--container-color);
+            color: var(--text-color);
+            font-size: var(--text-size-transcription);
+            line-height: var(--line-spacing);
+            overflow-y: auto;
+            margin-top:5px;
+            /* Hide scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        #transcriptionContainer::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* OLD: Bottom container styling - was for captions only */
+        /* Old single container styling - commented out */
+        /* #captionContainer {
+            position: absolute;
+            top: 50px;
+            bottom: 50px;
+            left: 50px;
+            right: 50px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: transparent;
+            color: white;
+            font-size: 28px;            
+            overflow-y: hidden;
+        } */
+        
+        /* NEW: Bottom container for TRANSLATIONS */
+        #captionContainer {
+            position: absolute;
+            top: calc(40% + 60px); /* Below transcription container */
+            bottom: 20px;
+            left: 20px;
+            right: 280px; /* Less space to use more of the screen */
+            padding: 10px;
+            border: 2px solid #fffff;
+            background-color: var(--container-color);
+            color: var(--text-color);
+            font-size: var(--text-size-translation);            
+            line-height: var(--line-spacing);
+            overflow-y: auto;
+            width: 85%;
+            margin-top: 30px;
+            /* Hide scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        #captionContainer::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* NEW: Container labels */
+        .container-label {
+            position: absolute;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 5px 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 5px;
+            z-index: 10;
+        }
+        
+        #transcriptionLabel {
+            top: 5px;
+            left: 20px;
+            color: #ffffff;
+        }
+        
+        #translationLabel {
+            top: calc(40% + 40px);
+            left: 20px;
+            color: #ffffff;
+            margin-top: 20px;
+        }
+
+        /* Language Controls */
+        #languageControls {
+            position: fixed;
+            top: 70px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.9);
+            padding: 10px;
+            border-radius: 8px;
+            min-width: 200px;
+            max-width: 250px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Hamburger Menu Button */
+        #hamburgerBtn {
+            position: fixed;
+            top: 20px;
+            right: 10px;
+            z-index: 1001;
+            background: rgba(0,0,0,0.9);
+            border: none;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        #hamburgerBtn:hover {
+            background: rgba(0,0,0,1);
+        }
+
+        /* Hamburger Icon */
+        .hamburger-icon {
+            display: block;
+            width: 20px;
+            height: 2px;
+            background: white;
+            margin: 4px 0;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .hamburger-icon:nth-child(2) {
+            margin: 4px 0;
+        }
+
+        /* Hamburger Animation - FINALLY FIXED X */
+        #hamburgerBtn.active .hamburger-icon:nth-child(1) {
+            transform: translateY(6px) rotate(45deg);
+        }
+
+        #hamburgerBtn.active .hamburger-icon:nth-child(2) {
+            opacity: 0;
+        }
+
+        #hamburgerBtn.active .hamburger-icon:nth-child(3) {
+            transform: translateY(-6px) rotate(-45deg);
+        }
+
+        /* Language Controls States */
+        #languageControls.collapsed {
+            width: 0;
+            min-width: 0;
+            max-width: 0;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(100%);
+        }
+
+        #languageControls.expanded {
+            width: 250px;
+            min-width: 200px;
+            max-width: 250px;
+            padding: 10px;
+            opacity: 1;
+            pointer-events: all;
+            transform: translateX(0);
+        }
+
+        /* Hamburger Menu Container */
+        .hamburger-container {
+            position: fixed;
+            top: 20px;
+            right: 10px;
+            z-index: 1001;
+        }
+
+        #languageControls label {
+            color: white;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .language-row {
+            margin-bottom: 5px;
+        }
+
+        .language-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .language-row label {
+            color: white;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .language-row select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: white;
+            color: black;
+            font-size: 12px;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .language-row:last-child select {
+            margin-bottom: 0;
+        }
+
+        /* Container Toggle Switch */
+        .container-toggle {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* Visual Settings */
+        .visual-settings {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .visual-settings > label {
+            color: white;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .setting-row {
+            margin-bottom: 10px;
+        }
+        
+        .setting-row label {
+            color: white;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .setting-row select {
+            width: 100%;
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: white;
+            color: black;
+            font-size: 12px;
+        }
+        
+        .color-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 5px 0;
+        }
+        
+        .color-swatch {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .color-swatch.active {
+            border-color: #3B82F6;
+            border-width: 3px;
+            transform: scale(1.05);
+        }
+        
+        .color-swatch.active::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(0, 0, 0, 0.7);
+            font-weight: bold;
+            font-size: 16px;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.8);
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            width: 100%;
+        }
+        
+        .slider-container input[type="range"] {
+            flex: 1;
+            cursor: pointer;
+            min-width: 0;
+        }
+        
+        .slider-container span {
+            color: white;
+            font-size: 11px;
+            min-width: 35px;
+            width: 35px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .size-btn {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            min-width: 24px;
+            width: 24px;
+            height: 24px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        
+        .size-btn:hover {
+            background: #2563EB;
+        }
+        
+        .size-btn:active {
+            transform: scale(0.95);
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .toggle-switch label {
+            color: white;
+            font-size: 12px;
+            margin: 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 20px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #3B82F6;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Container visibility states */
+        .single-container #transcriptionContainer {
+            top: 30px;
+            height: calc(100% - 60px);
+        }
+
+        .single-container #translationLabel {
+            display: none;
+        }
+
+        .single-container #captionContainer {
+            display: none;
+        }
+
+        .translation-only #transcriptionContainer {
+            display: none;
+        }
+
+        .translation-only #transcriptionLabel {
+            display: none;
+        }
+
+        .translation-only #captionContainer {
+            top: 30px;
+            bottom: 20px;
+            height: auto;
+        }
+
+        .translation-only #translationLabel {
+            top: 5px;
+        }
+
+        .both-hidden #transcriptionContainer {
+            display: none;
+        }
+
+        .both-hidden #translationContainer {
+            display: none;
+        }
+
+        .both-hidden #transcriptionLabel {
+            display: none;
+        }
+
+        .both-hidden #translationLabel {
+            display: none;
+        }
+
+        /* Each message is its own line */
+        .caption-line {
+            margin: 5px 0;
+        }
+        
+        /* NEW: Speaker label styling */
+        .speaker-label {
+            font-weight: bold;
+            color: #FFC107;
+            margin-right: 8px;
+        }
+        
+        /* Token styling - all tokens look the same */
+        .token {
+            color: white;
+        }
+        
+        /* NEW: Transcription line styling */
+        .transcription-line {
+            margin: 8px 0;
+            padding: 5px;
+            border-left: 3px solid #4CAF50;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- NEW: Container labels -->
+    <div id="transcriptionLabel" class="container-label">TRANSCRIPTIONS</div>
+    <div id="translationLabel" class="container-label">TRANSLATIONS</div>
+    
+    <!-- Hamburger Menu Button -->
+    <button id="hamburgerBtn" onclick="toggleLanguageMenu()">
+        <span class="hamburger-icon"></span>
+        <span class="hamburger-icon"></span>
+        <span class="hamburger-icon"></span>
+    </button>
+
+    <!-- Language Selection (Permanent Feature) -->
+    <div id="languageControls" class="collapsed">
+        <label>Translation Settings</label>
+        
+        <div class="language-row">
+            <label for="sourceLanguage">From:</label>
+            <select id="sourceLanguage" onchange="updateLanguageSelection()">
+                <option value="sl" selected>Slovenian</option>
+                <option value="en">English</option>
+                <option value="de">German</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="it">Italian</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="zh">Chinese</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="ar">Arabic</option>
+                <option value="hi">Hindi</option>
+                <option value="nl">Dutch</option>
+                <option value="sv">Swedish</option>
+                <option value="no">Norwegian</option>
+                <option value="da">Danish</option>
+                <option value="fi">Finnish</option>
+                <option value="pl">Polish</option>
+                <option value="cs">Czech</option>
+                <option value="sk">Slovak</option>
+                <option value="hu">Hungarian</option>
+                <option value="ro">Romanian</option>
+                <option value="bg">Bulgarian</option>
+                <option value="hr">Croatian</option>
+                <option value="sr">Serbian</option>
+                <option value="bs">Bosnian</option>
+                <option value="mk">Macedonian</option>
+                <option value="sq">Albanian</option>
+                <option value="el">Greek</option>
+                <option value="tr">Turkish</option>
+                <option value="uk">Ukrainian</option>
+                <option value="be">Belarusian</option>
+                <option value="et">Estonian</option>
+                <option value="lv">Latvian</option>
+                <option value="lt">Lithuanian</option>
+                <option value="ca">Catalan</option>
+                <option value="eu">Basque</option>
+                <option value="gl">Galician</option>
+                <option value="cy">Welsh</option>
+                <option value="ga">Irish</option>
+                <option value="mt">Maltese</option>
+                <option value="is">Icelandic</option>
+                <option value="fo">Faroese</option>
+            </select>
+        </div>
+        
+        <div class="language-row">
+            <label for="targetLanguage">To:</label>
+            <select id="targetLanguage" onchange="updateLanguageSelection()">
+                <option value="sl">Slovenian</option>
+                <option value="en" selected>English</option>
+                <option value="de">German</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="it">Italian</option>
+                <option value="pt">Portuguese</option>
+                <option value="ru">Russian</option>
+                <option value="zh">Chinese</option>
+                <option value="ja">Japanese</option>
+                <option value="ko">Korean</option>
+                <option value="ar">Arabic</option>
+                <option value="hi">Hindi</option>
+                <option value="nl">Dutch</option>
+                <option value="sv">Swedish</option>
+                <option value="no">Norwegian</option>
+                <option value="da">Danish</option>
+                <option value="fi">Finnish</option>
+                <option value="pl">Polish</option>
+                <option value="cs">Czech</option>
+                <option value="sk">Slovak</option>
+                <option value="hu">Hungarian</option>
+                <option value="ro">Romanian</option>
+                <option value="bg">Bulgarian</option>
+                <option value="hr">Croatian</option>
+                <option value="sr">Serbian</option>
+                <option value="bs">Bosnian</option>
+                <option value="mk">Macedonian</option>
+                <option value="sq">Albanian</option>
+                <option value="el">Greek</option>
+                <option value="tr">Turkish</option>
+                <option value="uk">Ukrainian</option>
+                <option value="be">Belarusian</option>
+                <option value="et">Estonian</option>
+                <option value="lv">Latvian</option>
+                <option value="lt">Lithuanian</option>
+                <option value="ca">Catalan</option>
+                <option value="eu">Basque</option>
+                <option value="gl">Galician</option>
+                <option value="cy">Welsh</option>
+                <option value="ga">Irish</option>
+                <option value="mt">Maltese</option>
+                <option value="is">Icelandic</option>
+                <option value="fo">Faroese</option>
+            </select>
+        </div>
+        
+        
+        <!-- Container Toggle Switches -->
+        <div class="container-toggle">
+            <div class="toggle-switch">
+                <label for="transcriptionToggle">Show Transcriptions</label>
+                <label class="switch">
+                    <input type="checkbox" id="transcriptionToggle" checked onchange="updateContainerVisibility()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="toggle-switch">
+                <label for="translationToggle">Show Translations</label>
+                <label class="switch">
+                    <input type="checkbox" id="translationToggle" checked onchange="updateContainerVisibility()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+        </div>
+        
+        <!-- Visual Settings -->
+        <div class="visual-settings">
+            <label>Visual Settings</label>
+            
+            <div class="setting-row">
+                <label for="containerColor">Container Color:</label>
+                <select id="containerColor" onchange="updateContainerColor()">
+                    <option value="rgba(0, 0, 0, 0.7)" selected>Black</option>
+                    <option value="rgba(255, 255, 255, 0.9)">White</option>
+                    <option value="transparent">Transparent</option>
+                </select>
+            </div>
+            
+            <div class="setting-row">
+                <label for="textColor">Text Color:</label>
+                <div class="color-picker">
+                    <div class="color-swatch active" data-color="#ffffff" style="background-color: #ffffff;" title="White"></div>
+                    <div class="color-swatch" data-color="#000000" style="background-color: #000000;" title="Black"></div>
+                    <div class="color-swatch" data-color="#ffff00" style="background-color: #ffff00;" title="Yellow"></div>
+                    <div class="color-swatch" data-color="#ff0000" style="background-color: #ff0000;" title="Red"></div>
+                    <div class="color-swatch" data-color="#00ff00" style="background-color: #00ff00;" title="Green"></div>
+                    <div class="color-swatch" data-color="#00ffff" style="background-color: #00ffff;" title="Cyan"></div>
+                    <div class="color-swatch" data-color="#ff00ff" style="background-color: #ff00ff;" title="Magenta"></div>
+                    <div class="color-swatch" data-color="#ffa500" style="background-color: #ffa500;" title="Orange"></div>
+                    <div class="color-swatch" data-color="#3B82F6" style="background-color: #3B82F6;" title="Blue"></div>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <label for="textSize">Text Size:</label>
+                <div class="slider-container">
+                    <button class="size-btn" onclick="decreaseTextSize()">-</button>
+                    <input type="range" id="textSize" min="12" max="48" value="24" onchange="updateTextSize()" oninput="updateTextSize()">
+                    <button class="size-btn" onclick="increaseTextSize()">+</button>
+                    <span id="textSizeValue">24px</span>
+                </div>
+            </div>
+            
+            <div class="setting-row">
+                <label for="lineSpacing">Line Spacing:</label>
+                <div class="slider-container">
+                    <button class="size-btn" onclick="decreaseLineSpacing()">-</button>
+                    <input type="range" id="lineSpacing" min="1.0" max="2.5" step="0.1" value="1.5" onchange="updateLineSpacing()" oninput="updateLineSpacing()">
+                    <button class="size-btn" onclick="increaseLineSpacing()">+</button>
+                    <span id="lineSpacingValue">1.5</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- NEW: Top container for TRANSCRIPTIONS (original speech) -->
+    <div id="transcriptionContainer"></div>
+    
+    <!-- OLD/MODIFIED: Bottom container for TRANSLATIONS -->
+    <!-- OLD: <div id="captionContainer"></div> -->
+    <div id="captionContainer"></div>
+
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script>
+        // NEW: Two containers - TOP for transcriptions, BOTTOM for translations
+        const transcriptionContainer = document.getElementById("transcriptionContainer");
+        const translationContainer = document.getElementById("captionContainer");
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/caption-hub")
+            .build();
+
+        let sourceLanguage = "sl"; // Default source language (matches backend default)
+        let targetLanguage = "en"; // Default target language (matches backend default)
+
+        // Enhanced handler - routes to TOP (transcription) or BOTTOM (translation) container
+        connection.on("ReceiveCaption", function (caption, isFinal, speaker, isTranslation) {
+            console.log(`[${isTranslation ? 'TRANSLATION' : 'TRANSCRIPTION'}] [${isFinal ? 'FINAL' : 'PARTIAL'}] Speaker: '${speaker}' (type: ${typeof speaker}): ${caption}`);
+
+            // Select the appropriate container
+            const targetContainer = isTranslation ? translationContainer : transcriptionContainer;
+
+            // Convert speaker to short format (normalize to empty string if null for consistent comparison)
+            const shortSpeaker = speaker ? "S" + speaker.replace("Speaker ", "") : '';
+            
+            // Check if we need a new line (different speaker or first token)
+            const lastElement = targetContainer.lastElementChild;
+            const lastSpeaker = lastElement ? lastElement.getAttribute('data-speaker') : '';
+            const needsNewLine = !lastElement || lastSpeaker !== shortSpeaker;
+            
+            if (needsNewLine) {
+                // Create new line with speaker label
+                const lineDiv = document.createElement("div");
+                lineDiv.className = "caption-line";
+                lineDiv.setAttribute('data-speaker', shortSpeaker);
+                
+                if (shortSpeaker) {
+                const speakerSpan = document.createElement("span");
+                speakerSpan.className = "speaker-label";
+                    speakerSpan.textContent = shortSpeaker + ": ";
+                    lineDiv.appendChild(speakerSpan);
+            }
+            
+            // Add token text
+            const textNode = document.createTextNode(caption);
+                lineDiv.appendChild(textNode);
+                
+                targetContainer.appendChild(lineDiv);
+            } else {
+                // Add to existing line (same speaker) - only if it's a final token
+                if (isFinal) {
+                    const textNode = document.createTextNode(caption);
+                    lastElement.appendChild(textNode);
+                }
+            }
+            
+            // Auto-scroll to bottom
+            targetContainer.scrollTop = targetContainer.scrollHeight;
+        });
+
+            // Update language selection
+            function updateLanguageSelection() {
+                const sourceSelect = document.getElementById('sourceLanguage');
+                const targetSelect = document.getElementById('targetLanguage');
+                sourceLanguage = sourceSelect.value;
+                targetLanguage = targetSelect.value;
+                console.log("Language selection changed to:", sourceLanguage, "→", targetLanguage);
+                
+                // Send language settings to backend via SignalR
+                console.log("Invoking UpdateLanguageSettings on backend...");
+                connection.invoke("UpdateLanguageSettings", sourceLanguage, targetLanguage)
+                    .then(() => {
+                        console.log("✅ Language settings sent to backend successfully");
+                    })
+                    .catch(err => {
+                        console.error("❌ Error updating language settings:", err);
+                        console.error("Error details:", JSON.stringify(err));
+                    });
+            }
+
+            // Toggle language menu
+            function toggleLanguageMenu() {
+                const hamburgerBtn = document.getElementById('hamburgerBtn');
+                const languageControls = document.getElementById('languageControls');
+                
+                if (languageControls.classList.contains('collapsed')) {
+                    // Expand menu
+                    languageControls.classList.remove('collapsed');
+                    languageControls.classList.add('expanded');
+                    hamburgerBtn.classList.add('active');
+                } else {
+                    // Collapse menu
+                    languageControls.classList.remove('expanded');
+                    languageControls.classList.add('collapsed');
+                    hamburgerBtn.classList.remove('active');
+                }
+            }
+
+            // Update container visibility based on both switches
+            function updateContainerVisibility() {
+                const transcriptionToggle = document.getElementById('transcriptionToggle');
+                const translationToggle = document.getElementById('translationToggle');
+                const transcriptionContainer = document.getElementById('transcriptionContainer');
+                const translationContainer = document.getElementById('captionContainer');
+                const transcriptionLabel = document.getElementById('transcriptionLabel');
+                const translationLabel = document.getElementById('translationLabel');
+                const body = document.body;
+                
+                // Remove all container classes
+                body.classList.remove('single-container', 'translation-only', 'both-hidden');
+                
+                // Show/hide transcription container
+                if (transcriptionToggle.checked) {
+                    transcriptionContainer.style.display = 'block';
+                    transcriptionLabel.style.display = 'block';
+                } else {
+                    transcriptionContainer.style.display = 'none';
+                    transcriptionLabel.style.display = 'none';
+                }
+                
+                // Show/hide translation container
+                if (translationToggle.checked) {
+                    translationContainer.style.display = 'block';
+                    translationLabel.style.display = 'block';
+                } else {
+                    translationContainer.style.display = 'none';
+                    translationLabel.style.display = 'none';
+                }
+                
+                // Apply appropriate layout classes
+                if (transcriptionToggle.checked && !translationToggle.checked) {
+                    // Only transcription visible
+                    body.classList.add('single-container');
+                    console.log("Showing only transcriptions");
+                } else if (!transcriptionToggle.checked && translationToggle.checked) {
+                    // Only translation visible
+                    body.classList.add('translation-only');
+                    console.log("Showing only translations");
+                } else if (!transcriptionToggle.checked && !translationToggle.checked) {
+                    // Both hidden
+                    body.classList.add('both-hidden');
+                    console.log("Both containers hidden");
+                } else {
+                    // Both visible (default)
+                    console.log("Showing both containers");
+                }
+                
+                // Save to localStorage
+                localStorage.setItem('transcriptionVisible', transcriptionToggle.checked);
+                localStorage.setItem('translationVisible', translationToggle.checked);
+            }
+
+            // Update container color using CSS custom properties
+            function updateContainerColor() {
+                const colorSelect = document.getElementById('containerColor');
+                
+                const selectedColor = colorSelect.value;
+                
+                // Update CSS custom property
+                document.documentElement.style.setProperty('--container-color', selectedColor);
+                
+                // Save to localStorage
+                localStorage.setItem('containerColor', selectedColor);
+                
+                console.log("Container color updated to:", selectedColor);
+            }
+            
+            // Update text color using CSS custom properties AND OBS
+            async function updateTextColor(color) {
+                // Update CSS custom property
+                document.documentElement.style.setProperty('--text-color', color);
+                
+                // Update active state on swatches
+                const swatches = document.querySelectorAll('.color-swatch');
+                swatches.forEach(swatch => {
+                    if (swatch.getAttribute('data-color') === color) {
+                        swatch.classList.add('active');
+                    } else {
+                        swatch.classList.remove('active');
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('textColor', color);
+                
+                // Update OBS automatically
+                await updateOBSCSS();
+                
+                console.log("Text color updated to:", color);
+            }
+            
+            // Update text size using CSS custom properties AND OBS
+            async function updateTextSize() {
+                const sizeSlider = document.getElementById('textSize');
+                const sizeValue = document.getElementById('textSizeValue');
+                
+                const selectedSize = sizeSlider.value + 'px';
+                
+                // Update CSS custom properties for both containers
+                document.documentElement.style.setProperty('--text-size-transcription', selectedSize);
+                document.documentElement.style.setProperty('--text-size-translation', selectedSize);
+                
+                sizeValue.textContent = selectedSize;
+                
+                // Save to localStorage
+                localStorage.setItem('textSize', sizeSlider.value);
+                
+                // Update OBS automatically
+                await updateOBSCSS();
+                
+                console.log("Text size updated to:", selectedSize);
+            }
+            
+            // Increase text size
+            function increaseTextSize() {
+                const sizeSlider = document.getElementById('textSize');
+                const currentValue = parseInt(sizeSlider.value);
+                const maxValue = parseInt(sizeSlider.max);
+                
+                if (currentValue < maxValue) {
+                    sizeSlider.value = currentValue + 1;
+                    updateTextSize();
+                }
+            }
+            
+            // Decrease text size
+            function decreaseTextSize() {
+                const sizeSlider = document.getElementById('textSize');
+                const currentValue = parseInt(sizeSlider.value);
+                const minValue = parseInt(sizeSlider.min);
+                
+                if (currentValue > minValue) {
+                    sizeSlider.value = currentValue - 1;
+                    updateTextSize();
+                }
+            }
+            
+            // Update line spacing using CSS custom properties
+            function updateLineSpacing() {
+                const spacingSlider = document.getElementById('lineSpacing');
+                const spacingValue = document.getElementById('lineSpacingValue');
+                
+                const selectedSpacing = parseFloat(spacingSlider.value);
+                
+                // Update CSS custom property
+                document.documentElement.style.setProperty('--line-spacing', selectedSpacing);
+                
+                spacingValue.textContent = selectedSpacing.toFixed(1);
+                
+                // Save to localStorage
+                localStorage.setItem('lineSpacing', spacingSlider.value);
+                
+                console.log("Line spacing updated to:", selectedSpacing);
+            }
+            
+            // Increase line spacing
+            function increaseLineSpacing() {
+                const spacingSlider = document.getElementById('lineSpacing');
+                const currentValue = parseFloat(spacingSlider.value);
+                const maxValue = parseFloat(spacingSlider.max);
+                
+                if (currentValue < maxValue) {
+                    spacingSlider.value = (currentValue + 0.1).toFixed(1);
+                    updateLineSpacing();
+                }
+            }
+            
+            // Decrease line spacing
+            function decreaseLineSpacing() {
+                const spacingSlider = document.getElementById('lineSpacing');
+                const currentValue = parseFloat(spacingSlider.value);
+                const minValue = parseFloat(spacingSlider.min);
+                
+                if (currentValue > minValue) {
+                    spacingSlider.value = (currentValue - 0.1).toFixed(1);
+                    updateLineSpacing();
+                }
+            }
+
+        // Handle language updates from backend
+        connection.on("ReceiveLanguageUpdate", function (sourceLanguage, targetLanguage) {
+            console.log("Received language update from backend:", sourceLanguage, "→", targetLanguage);
+            // Update local variables
+            sourceLanguage = sourceLanguage;
+            targetLanguage = targetLanguage;
+        });
+
+        // Initialize color swatches
+        function initializeColorSwatches() {
+            const swatches = document.querySelectorAll('.color-swatch');
+            swatches.forEach(swatch => {
+                swatch.addEventListener('click', function() {
+                    const color = this.getAttribute('data-color');
+                    updateTextColor(color);
+                });
+            });
+        }
+        
+        // Load and apply settings from localStorage
+        function loadAndApplySettings() {
+            console.log('🔧 Loading settings from localStorage...');
+            
+            // Load text color
+            const savedTextColor = localStorage.getItem('textColor') || '#ffffff';
+            console.log('📝 Loading text color:', savedTextColor);
+            updateTextColor(savedTextColor);
+            
+            // Load text size
+            const savedTextSize = localStorage.getItem('textSize') || '24';
+            console.log('📏 Loading text size:', savedTextSize);
+            document.getElementById('textSize').value = savedTextSize;
+            updateTextSize();
+            
+            // Load line spacing
+            const savedLineSpacing = localStorage.getItem('lineSpacing') || '1.5';
+            console.log('📐 Loading line spacing:', savedLineSpacing);
+            document.getElementById('lineSpacing').value = savedLineSpacing;
+            updateLineSpacing();
+            
+            // Load container color
+            const savedContainerColor = localStorage.getItem('containerColor') || 'rgba(0, 0, 0, 0.7)';
+            console.log('🎨 Loading container color:', savedContainerColor);
+            document.getElementById('containerColor').value = savedContainerColor;
+            updateContainerColor();
+            
+            // Load visibility toggles
+            const transcriptionVisible = localStorage.getItem('transcriptionVisible');
+            const translationVisible = localStorage.getItem('translationVisible');
+            console.log('👁️ Loading visibility - transcription:', transcriptionVisible, 'translation:', translationVisible);
+            
+            if (transcriptionVisible !== null) {
+                document.getElementById('transcriptionToggle').checked = transcriptionVisible === 'true';
+            }
+            if (translationVisible !== null) {
+                document.getElementById('translationToggle').checked = translationVisible === 'true';
+            }
+            updateContainerVisibility();
+            
+            console.log('✅ Settings loaded and applied from localStorage');
+        }
+        
+        // Apply settings immediately on page load using CSS custom properties
+        function applySettingsImmediately() {
+            console.log('🚀 Applying settings immediately on page load...');
+            
+            // Apply text color immediately
+            const savedTextColor = localStorage.getItem('textColor');
+            if (savedTextColor) {
+                document.documentElement.style.setProperty('--text-color', savedTextColor);
+                console.log('🎨 Applied text color immediately:', savedTextColor);
+            }
+            
+            // Apply text size immediately
+            const savedTextSize = localStorage.getItem('textSize');
+            if (savedTextSize) {
+                const size = savedTextSize + 'px';
+                document.documentElement.style.setProperty('--text-size-transcription', size);
+                document.documentElement.style.setProperty('--text-size-translation', size);
+                console.log('📏 Applied text size immediately:', size);
+            }
+            
+            // Apply line spacing immediately
+            const savedLineSpacing = localStorage.getItem('lineSpacing');
+            if (savedLineSpacing) {
+                document.documentElement.style.setProperty('--line-spacing', savedLineSpacing);
+                console.log('📐 Applied line spacing immediately:', savedLineSpacing);
+            }
+            
+            // Apply container color immediately
+            const savedContainerColor = localStorage.getItem('containerColor');
+            if (savedContainerColor) {
+                document.documentElement.style.setProperty('--container-color', savedContainerColor);
+                console.log('🎨 Applied container color immediately:', savedContainerColor);
+            }
+            
+            console.log('✅ Immediate settings application complete');
+        }
+        
+            // Force refresh function for testing (can be called from browser console)
+            window.forceRefreshSettings = function() {
+                console.log('🔄 Force refreshing all settings...');
+                applySettingsImmediately();
+                loadAndApplySettings();
+            };
+
+            // OBS WebSocket integration
+            async function updateOBSCSS() {
+                try {
+                    const currentSettings = getCurrentStyleSettings();
+                    const css = generateOBSCSS(currentSettings);
+                    
+                    const response = await fetch('/api/OBStyling/update-css', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            sourceName: 'Browser Source', // Change this to your actual OBS source name
+                            css: css
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log('✅ OBS CSS updated successfully');
+                    } else {
+                        console.log('⚠️ OBS CSS update failed:', result.message);
+                    }
+                } catch (error) {
+                    console.log('⚠️ OBS WebSocket not available:', error.message);
+                }
+            }
+
+            function getCurrentStyleSettings() {
+                return {
+                    textColor: document.documentElement.style.getPropertyValue('--text-color') || '#ffffff',
+                    textSize: document.documentElement.style.getPropertyValue('--text-size-transcription') || '24px',
+                    lineSpacing: document.documentElement.style.getPropertyValue('--line-spacing') || '1.5',
+                    containerColor: document.documentElement.style.getPropertyValue('--container-color') || 'rgba(0, 0, 0, 0.7)',
+                    transcriptionVisible: document.getElementById('transcriptionToggle')?.checked ?? true,
+                    translationVisible: document.getElementById('translationToggle')?.checked ?? true
+                };
+            }
+
+            function generateOBSCSS(settings) {
+                return `/* Auto-generated OBS CSS */
+#transcriptionContainer,
+#captionContainer {
+    color: ${settings.textColor} !important;
+    font-size: ${settings.textSize} !important;
+    line-height: ${settings.lineSpacing} !important;
+    background-color: ${settings.containerColor} !important;
+}
+
+/* Hide scrollbars */
+#transcriptionContainer::-webkit-scrollbar,
+#captionContainer::-webkit-scrollbar {
+    display: none !important;
+}
+
+/* Container visibility */
+${!settings.transcriptionVisible ? `#transcriptionContainer,
+#transcriptionLabel {
+    display: none !important;
+}` : ''}
+
+${!settings.translationVisible ? `#captionContainer,
+#translationLabel {
+    display: none !important;
+}` : ''}
+
+/* Force override any conflicting styles */
+body {
+    overflow: hidden !important;
+}`;
+            }
+
+        // Apply settings immediately on page load (before SignalR connection)
+        applySettingsImmediately();
+        
+        // Also apply settings when DOM is fully loaded (for OBS compatibility)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 DOM loaded, applying settings again...');
+            applySettingsImmediately();
+        });
+        
+        // Fallback: Apply settings on window load (for OBS Browser Source)
+        window.addEventListener('load', function() {
+            console.log('🪟 Window loaded, applying settings as fallback...');
+            applySettingsImmediately();
+        });
+
+        connection.start().then(() => {
+            console.log("Connected to hub - ready for transcriptions and translations!");
+            
+            // Load and apply saved settings first (before any captions arrive)
+            loadAndApplySettings();
+            
+            // Reset dropdowns to default app startup languages (sl → en)
+            const sourceSelect = document.getElementById('sourceLanguage');
+            const targetSelect = document.getElementById('targetLanguage');
+            sourceSelect.value = 'sl';
+            targetSelect.value = 'en';
+            sourceLanguage = 'sl';
+            targetLanguage = 'en';
+            
+            // Initialize color picker
+            initializeColorSwatches();
+            
+            console.log("Language dropdowns reset to default: sl → en");
+        }).catch(err => console.error(err));
+    </script>
+</body>
+</html>
