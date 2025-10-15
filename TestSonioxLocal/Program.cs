@@ -42,6 +42,16 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     }
 });
 
+// Override the default URLs to prevent conflicts with launchSettings.json
+if (useHttps)
+{
+    builder.WebHost.UseUrls("https://localhost:50001");
+}
+else
+{
+    builder.WebHost.UseUrls("http://localhost:50000");
+}
+
 Console.WriteLine("💡 Usage:");
 Console.WriteLine("   dotnet run --http    or  dotnet run -h  (OBS compatible, styling issues)");
 Console.WriteLine("   dotnet run --https   or  dotnet run -s  (Better styling, may not work in OBS)");
