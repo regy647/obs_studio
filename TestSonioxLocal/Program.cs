@@ -12,6 +12,25 @@ var builder = WebApplication.CreateBuilder(args);
 var useHttps = args.Contains("--https") || args.Contains("-s");
 var useHttp = args.Contains("--http") || args.Contains("-h");
 
+// Also check launchSettings.json for Rider/Visual Studio compatibility
+if (!useHttps && !useHttp)
+{
+    var urls = builder.Configuration["urls"] ?? builder.Configuration["applicationUrl"];
+    if (urls != null)
+    {
+        if (urls.Contains("https://"))
+        {
+            useHttps = true;
+            Console.WriteLine("🔍 Detected HTTPS from launchSettings.json");
+        }
+        else if (urls.Contains("http://"))
+        {
+            useHttp = true;
+            Console.WriteLine("🔍 Detected HTTP from launchSettings.json");
+        }
+    }
+}
+
 // Default to HTTP if no protocol specified
 if (!useHttps && !useHttp)
 {
