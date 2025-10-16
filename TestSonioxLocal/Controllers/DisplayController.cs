@@ -79,7 +79,7 @@ public class DisplayController : ControllerBase
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 5px;
             z-index: 10;
-            color: {settings.TextColor};
+            color: #ffffff;
             display: {transcriptionLabelDisplay};
         }}
 
@@ -93,19 +93,20 @@ public class DisplayController : ControllerBase
             background-color: rgba(0, 0, 0, 0.8);
             border-radius: 5px;
             z-index: 10;
-            color: {settings.TextColor};
+            color: #ffffff;
             display: {translationLabelDisplay};
+            margin-top: 20px;
         }}
 
         #transcriptionContainer {{
             position: absolute;
             top: 30px;
-            left: 20px;
-            right: 280px;
+            left: 50%;
+            transform: translateX(-50%);
             height: 40%;
-            width: 85%;
+            width: 96%;
             padding: 10px;
-            border: 2px solid #ffffff;
+            border: none;
             background-color: {settings.ContainerColor};
             color: {settings.TextColor};
             font-size: {settings.TextSize}px;
@@ -121,16 +122,16 @@ public class DisplayController : ControllerBase
             position: absolute;
             top: calc(40% + 60px);
             bottom: 20px;
-            left: 20px;
-            right: 280px;
+            left: 50%;
+            transform: translateX(-50%);
             padding: 10px;
-            border: 2px solid #ffffff;
+            border: none;
             background-color: {settings.ContainerColor};
             color: {settings.TextColor};
             font-size: {settings.TextSize + 4}px;
             line-height: {settings.LineSpacing};
             overflow-y: auto;
-            width: 85%;
+            width: 96%;
             margin-top: 30px;
             display: {translationDisplay};
             scrollbar-width: none;
