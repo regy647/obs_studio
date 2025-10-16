@@ -1,0 +1,33 @@
+{
+  "Files": [
+    {
+      "Id": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\js\\caption.js",
+      "PackagePath": "staticwebassets\\js\\caption.js"
+    },
+    {
+      "Id": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\js\\signalr\\dist\\browser\\signalr.js",
+      "PackagePath": "staticwebassets\\js\\signalr\\dist\\browser\\signalr.js"
+    },
+    {
+      "Id": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\js\\signalr\\dist\\browser\\signalr.min.js",
+      "PackagePath": "staticwebassets\\js\\signalr\\dist\\browser\\signalr.min.js"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.TestSonioxLocal.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.build.TestSonioxLocal.props",
+      "PackagePath": "build\\TestSonioxLocal.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildMultiTargeting.TestSonioxLocal.props",
+      "PackagePath": "buildMultiTargeting\\TestSonioxLocal.props"
+    },
+    {
+      "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.buildTransitive.TestSonioxLocal.props",
+      "PackagePath": "buildTransitive\\TestSonioxLocal.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

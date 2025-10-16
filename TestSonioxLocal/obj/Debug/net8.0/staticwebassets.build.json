@@ -1,0 +1,77 @@
+{
+  "Version": 1,
+  "Hash": "yKrP7ItXvLBXHPBpyIN0syhLsxNYUGlpBDQH8RkduCY=",
+  "Source": "TestSonioxLocal",
+  "BasePath": "_content/TestSonioxLocal",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [
+    {
+      "Name": "TestSonioxLocal\\wwwroot",
+      "Source": "TestSonioxLocal",
+      "ContentRoot": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\",
+      "BasePath": "_content/TestSonioxLocal",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\js\\caption.js",
+      "SourceId": "TestSonioxLocal",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\",
+      "BasePath": "_content/TestSonioxLocal",
+      "RelativePath": "js/caption.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\caption.js"
+    },
+    {
+      "Identity": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\js\\signalr\\dist\\browser\\signalr.js",
+      "SourceId": "TestSonioxLocal",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\",
+      "BasePath": "_content/TestSonioxLocal",
+      "RelativePath": "js/signalr/dist/browser/signalr.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\signalr\\dist\\browser\\signalr.js"
+    },
+    {
+      "Identity": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\js\\signalr\\dist\\browser\\signalr.min.js",
+      "SourceId": "TestSonioxLocal",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\leoob\\RiderProjects\\obs_studio\\TestSonioxLocal\\wwwroot\\",
+      "BasePath": "_content/TestSonioxLocal",
+      "RelativePath": "js/signalr/dist/browser/signalr.min.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\signalr\\dist\\browser\\signalr.min.js"
+    }
+  ]
+}

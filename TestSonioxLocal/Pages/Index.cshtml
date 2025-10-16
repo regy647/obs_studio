@@ -2,11 +2,12 @@
 @model TestSonioxLocal.Pages.IndexModel
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8">
     <title>Captions Test</title>
     <style>
+        /* CSS Custom Properties (Variables) */
         :root {
             --text-color: #ffffff;
             --text-size-transcription: 24px;
@@ -32,11 +33,11 @@
             height: 40%; /* Takes top 40% of available space */
             width: 85%;
             padding: 10px;
-            border: 2px solid #fffff;
-            background-color: var(--container-color);
-            color: var(--text-color);
-            font-size: var(--text-size-transcription);
-            line-height: var(--line-spacing);
+            border: 2px solid #ffffff;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            font-size: 24px;
+            line-height: 1.5;
             overflow-y: auto;
             margin-top:5px;
             /* Hide scrollbar */
@@ -73,11 +74,11 @@
             left: 20px;
             right: 280px; /* Less space to use more of the screen */
             padding: 10px;
-            border: 2px solid #fffff;
-            background-color: var(--container-color);
-            color: var(--text-color);
-            font-size: var(--text-size-translation);            
-            line-height: var(--line-spacing);
+            border: 2px solid #ffffff;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: #ffffff;
+            font-size: 28px;            
+            line-height: 1.5;
             overflow-y: auto;
             width: 85%;
             margin-top: 30px;
@@ -189,23 +190,6 @@
             transform: translateX(100%);
         }
 
-        #languageControls.expanded {
-            width: 250px;
-            min-width: 200px;
-            max-width: 250px;
-            padding: 10px;
-            opacity: 1;
-            pointer-events: all;
-            transform: translateX(0);
-        }
-
-        /* Hamburger Menu Container */
-        .hamburger-container {
-            position: fixed;
-            top: 20px;
-            right: 10px;
-            z-index: 1001;
-        }
 
         #languageControls label {
             color: white;
@@ -472,7 +456,7 @@
             display: none;
         }
 
-        .both-hidden #translationContainer {
+        .both-hidden #captionContainer {
             display: none;
         }
 
@@ -659,7 +643,7 @@
             </div>
             
             <div class="setting-row">
-                <label for="textColor">Text Color:</label>
+                <label>Text Color:</label>
                 <div class="color-picker">
                     <div class="color-swatch active" data-color="#ffffff" style="background-color: #ffffff;" title="White"></div>
                     <div class="color-swatch" data-color="#000000" style="background-color: #000000;" title="Black"></div>
@@ -858,8 +842,10 @@
                 
                 const selectedColor = colorSelect.value;
                 
-                // Update CSS custom property
-                document.documentElement.style.setProperty('--container-color', selectedColor);
+                // Update container background color directly
+                document.querySelectorAll('#transcriptionContainer, #captionContainer').forEach(container => {
+                    container.style.backgroundColor = selectedColor;
+                });
                 
                 // Save to localStorage
                 localStorage.setItem('containerColor', selectedColor);
@@ -869,8 +855,10 @@
             
             // Update text color using CSS custom properties AND OBS
             async function updateTextColor(color) {
-                // Update CSS custom property
-                document.documentElement.style.setProperty('--text-color', color);
+                // Update text color directly
+                document.querySelectorAll('#transcriptionContainer, #captionContainer').forEach(container => {
+                    container.style.color = color;
+                });
                 
                 // Update active state on swatches
                 const swatches = document.querySelectorAll('.color-swatch');
@@ -898,9 +886,9 @@
                 
                 const selectedSize = sizeSlider.value + 'px';
                 
-                // Update CSS custom properties for both containers
-                document.documentElement.style.setProperty('--text-size-transcription', selectedSize);
-                document.documentElement.style.setProperty('--text-size-translation', selectedSize);
+                // Update text size directly for both containers
+                document.getElementById('transcriptionContainer').style.fontSize = selectedSize;
+                document.getElementById('captionContainer').style.fontSize = selectedSize;
                 
                 sizeValue.textContent = selectedSize;
                 
@@ -944,8 +932,10 @@
                 
                 const selectedSpacing = parseFloat(spacingSlider.value);
                 
-                // Update CSS custom property
-                document.documentElement.style.setProperty('--line-spacing', selectedSpacing);
+                // Update line spacing directly for both containers
+                document.querySelectorAll('#transcriptionContainer, #captionContainer').forEach(container => {
+                    container.style.lineHeight = selectedSpacing;
+                });
                 
                 spacingValue.textContent = selectedSpacing.toFixed(1);
                 
@@ -980,11 +970,11 @@
             }
 
         // Handle language updates from backend
-        connection.on("ReceiveLanguageUpdate", function (sourceLanguage, targetLanguage) {
-            console.log("Received language update from backend:", sourceLanguage, "→", targetLanguage);
+        connection.on("ReceiveLanguageUpdate", function (newSourceLanguage, newTargetLanguage) {
+            console.log("Received language update from backend:", newSourceLanguage, "→", newTargetLanguage);
             // Update local variables
-            sourceLanguage = sourceLanguage;
-            targetLanguage = targetLanguage;
+            sourceLanguage = newSourceLanguage;
+            targetLanguage = newTargetLanguage;
         });
 
         // Initialize color swatches
@@ -1048,7 +1038,9 @@
             // Apply text color immediately
             const savedTextColor = localStorage.getItem('textColor');
             if (savedTextColor) {
-                document.documentElement.style.setProperty('--text-color', savedTextColor);
+                document.querySelectorAll('#transcriptionContainer, #captionContainer').forEach(container => {
+                    container.style.color = savedTextColor;
+                });
                 console.log('🎨 Applied text color immediately:', savedTextColor);
             }
             
@@ -1056,22 +1048,26 @@
             const savedTextSize = localStorage.getItem('textSize');
             if (savedTextSize) {
                 const size = savedTextSize + 'px';
-                document.documentElement.style.setProperty('--text-size-transcription', size);
-                document.documentElement.style.setProperty('--text-size-translation', size);
+                document.getElementById('transcriptionContainer').style.fontSize = size;
+                document.getElementById('captionContainer').style.fontSize = size;
                 console.log('📏 Applied text size immediately:', size);
             }
             
             // Apply line spacing immediately
             const savedLineSpacing = localStorage.getItem('lineSpacing');
             if (savedLineSpacing) {
-                document.documentElement.style.setProperty('--line-spacing', savedLineSpacing);
+                document.querySelectorAll('#transcriptionContainer, #captionContainer').forEach(container => {
+                    container.style.lineHeight = savedLineSpacing;
+                });
                 console.log('📐 Applied line spacing immediately:', savedLineSpacing);
             }
             
             // Apply container color immediately
             const savedContainerColor = localStorage.getItem('containerColor');
             if (savedContainerColor) {
-                document.documentElement.style.setProperty('--container-color', savedContainerColor);
+                document.querySelectorAll('#transcriptionContainer, #captionContainer').forEach(container => {
+                    container.style.backgroundColor = savedContainerColor;
+                });
                 console.log('🎨 Applied container color immediately:', savedContainerColor);
             }
             

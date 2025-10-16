@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace TestSonioxLocal.Pages;
 
-public class OBSStylerModel : PageModel
+public class LegacyStylerModel : PageModel
 {
     public void OnGet()
     {

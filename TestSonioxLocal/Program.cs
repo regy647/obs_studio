@@ -169,4 +169,7 @@ app.MapControllers();
 app.MapRazorPages();
 app.MapHub<CaptionHub>("/caption-hub");
 
+// Redirect root to settings page for better user experience
+app.MapGet("/", () => Results.Redirect("/settings"));
+
 app.Run();
