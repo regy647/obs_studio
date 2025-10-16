@@ -76,6 +76,8 @@ Console.WriteLine("   dotnet run --http    or  dotnet run -h  (OBS compatible, s
 Console.WriteLine("   dotnet run --https   or  dotnet run -s  (Better styling, may not work in OBS)");
 Console.WriteLine();
 
+
+//vhodni 
 Channel<WsMessage> loopbackSendChannel = Channel.CreateBounded<WsMessage>(
     new BoundedChannelOptions(capacity: 1000)
     {
@@ -85,6 +87,7 @@ Channel<WsMessage> loopbackSendChannel = Channel.CreateBounded<WsMessage>(
     });
 builder.Services.AddSingleton(loopbackSendChannel);
 
+//vhodni
 Channel<WsMessage> micSendChannel = Channel.CreateBounded<WsMessage>(
     new BoundedChannelOptions(capacity: 1000)
     {
@@ -94,6 +97,7 @@ Channel<WsMessage> micSendChannel = Channel.CreateBounded<WsMessage>(
     });
 builder.Services.AddSingleton(micSendChannel);
 
+//izhodni 
 Channel<CaptionMessage> captionChannel = Channel.CreateBounded<CaptionMessage>(
     new BoundedChannelOptions(capacity: 1000)
     {
